@@ -1,56 +1,56 @@
 'use client';
 
-import { createClient } from '@/utils/supabase/client';
-import { useEffect, useState } from 'react';
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
+
 
 interface OrderListProps {
-  orders: Array<any>;
+    orders: Array<any>;
 }
 
 export default function OrderList({
-  orders = []
+    orders = []
 }: OrderListProps) {
-  const supabase = createClient();
-  const [internalOrders, setInternalOrders] = useState(orders);
+    const supabase = createClient();
+    const [internalOrders, setInternalOrders] = useState(orders);
 
-  useEffect(() => {
-    const subscriber = supabase.channel('order')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-      }, (payload: any) => {
-        setInternalOrders((prevOrders) => [...prevOrders, payload.new]);
-      })
-      .subscribe();
+    useEffect(() => {
+        const subscriber = supabase.channel('order')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+        }, (payload: any) => {
+          setInternalOrders((prevOrders) => [...prevOrders, payload.new]);
+        })
+        .subscribe();
 
-    // Actividad: Implementar la lógica para aplicar los cambios en el arreglo de orders
-    // con los datos provenientes de la base de datos (hint: Update).
+        //TODO: implementar la lógica para aplicar los cambnios en el arreglo de orders con los datos provenientes de la BD (hint: update) 
 
-    return () => {
-      subscriber.unsubscribe();
-    }
-  }, []);
+        return() => {
+            subscriber.unsubscribe();
+        }
+    }, []);
 
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Subtotal</th>
-          <th>Discount</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {internalOrders?.map((order) => (
-          <tr key={order.id}>
-            <td>{order.id}</td>
-            <td>{order.subtotal}</td>
-            <td>{order.discount}</td>
-            <td>{order.total}</td>
+    return (
+        <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Subtotal</th>
+            <th>Discount</th>
+            <th>Total</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  )
+        </thead>
+        <tbody>
+          {internalOrders?.map((order) => (
+            <tr key={order.id}>
+              <td>{order.id}</td>
+              <td>{order.subtotal}</td>
+              <td>{order.discount}</td>
+              <td>{order.total}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
 }

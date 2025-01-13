@@ -1,4 +1,4 @@
-import OrderList from '@/components/OrderList';
+import OrderList from "@/components/OrderList";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -14,11 +14,10 @@ export default async function ProtectedPage() {
   }
 
   const { data } = await supabase.from('order').select('*');
-  console.log(data);
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
-     
+      <OrderList orders={data as any[]} />
     </div>
   );
 }
