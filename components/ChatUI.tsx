@@ -18,7 +18,7 @@ export default function ChatUI({
   const [subscribed, setSubscribed] = useState(false);
   const supabase = createClient();
   const channel = supabase.channel('general', {
-    config:{
+    config: {
       broadcast: { self: true }
     }
   });
@@ -26,14 +26,14 @@ export default function ChatUI({
   useEffect(() => {
     channel.subscribe((status) => {
       console.log(status);
-      if(status === 'SUBSCRIBED'){
+      if (status === 'SUBSCRIBED') {
         setSubscribed(true);
       }
     });
 
-    channel.on('broadcast',{
+    channel.on('broadcast', {
       event: 'message'
-    }, ({payload}) => { setMessages((prevState: any) => [...prevState, payload]) })
+    }, ({ payload }) => { setMessages((prevState: any) => [...prevState, payload]) })
 
     return () => {
       channel.unsubscribe();
@@ -47,7 +47,7 @@ export default function ChatUI({
       channel.send({
         type: 'broadcast',
         event: 'message',
-        payload:{
+        payload: {
           message,
           user: userId,
           email,
@@ -61,23 +61,31 @@ export default function ChatUI({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex-1">
-        <ul className='flex flex-col gap-1.5' >
-          {messages.map(({ email, message }: any, index: number) => (
-            <li key={index}>
-              <div className='flex flex-col gap-1.5 bg-neutral-800 px-4 py-2'>
-                <span className='font-bold' >{email}:</span>
-                <p>{message}</p>
-              </div>
-            </li>
-          ))}
+        <ul className="flex flex-col gap-1.5">
+          {messages.map(({ email: senderEmail, message, user }: any, index: number) => {
+            const isOwnMessage = user === userId;
+
+            return (
+              <li key={index} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`max-w-xs px-4 py-2 rounded-lg shadow-md ${isOwnMessage ? "bg-purple-500 text-white self-end" : "bg-yellow-400 text-black self-start"
+                    }`}
+                >
+                  <span className="font-bold block">{senderEmail}:</span>
+                  <p>{message}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
+
       </div>
       <form className='flex gap-1 items-center' onSubmit={onHandleSubmit}>
         <input
-        className='px-5 py-1.5 w-full bg-transparent placeholder:text-green-400 text-green-700 text-sm border border-green-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-green-500 hover:border-green-300 shadow-sm focus:shadow'
+          className='px-5 py-1.5 w-full bg-transparent placeholder:text-green-400 text-green-700 text-sm border border-green-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-green-500 hover:border-green-300 shadow-sm focus:shadow'
           value={message}
-          onChange={(e) => setMessage(e.target.value)}  
-          type="text" 
+          onChange={(e) => setMessage(e.target.value)}
+          type="text"
           placeholder="Type here..."
         />
         <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded' >Send</button>
