@@ -40,11 +40,12 @@ export const updateSession = async (request: NextRequest) => {
     const user = await supabase.auth.getUser();
 
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    if (request.nextUrl.pathname.startsWith("/protected/chat") && user.error) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
     if (request.nextUrl.pathname === "/" && !user.error) {
+      // enviar directamente al chat cuando se autentique el usuario
       return NextResponse.redirect(new URL("/protected/chat", request.url));
     }
 

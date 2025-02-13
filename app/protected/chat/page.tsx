@@ -14,7 +14,7 @@ export default async function Chat() {
     }
 
     return (
-        <ChatUI userId={user.id} />
+        <ChatUI userId={user.id} email={user.email} />
     );
 
 }
